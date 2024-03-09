@@ -1374,6 +1374,7 @@ struct task_struct {
 	int				mce_count;
 #endif
 	ANDROID_VENDOR_DATA_ARRAY(1, 64);
+	/* Please add your member in struct oplus_task_struct */
 	ANDROID_OEM_DATA_ARRAY(1, 32);
 
 	/* PF_IO_WORKER */
@@ -1813,10 +1814,16 @@ static inline void kick_process(struct task_struct *tsk) { }
 #endif
 
 extern void __set_task_comm(struct task_struct *tsk, const char *from, bool exec);
+#ifdef CONFIG_CONT_PTE_HUGEPAGE
+extern void update_task_hugepage_critical_flag(struct task_struct *tsk);
+#endif
 
 static inline void set_task_comm(struct task_struct *tsk, const char *from)
 {
 	__set_task_comm(tsk, from, false);
+#ifdef CONFIG_CONT_PTE_HUGEPAGE
+	update_task_hugepage_critical_flag(tsk);
+#endif
 }
 
 extern char *__get_task_comm(char *to, size_t len, struct task_struct *tsk);

@@ -918,6 +918,8 @@ struct io_defer_entry {
 struct io_op_def {
 	/* needs req->file assigned */
 	unsigned		needs_file : 1;
+	/* don't fail if file grab fails */
+	unsigned		needs_file_no_error : 1;
 	/* hash wq insertion if file is a regular file */
 	unsigned		hash_reg_file : 1;
 	/* unbound wq insertion if file is a non-regular file */
@@ -935,6 +937,7 @@ struct io_op_def {
 	unsigned		plug : 1;
 	/* size of async data needed, if any */
 	unsigned short		async_size;
+	unsigned		work_flags;
 };
 
 static const struct io_op_def io_op_defs[] = {

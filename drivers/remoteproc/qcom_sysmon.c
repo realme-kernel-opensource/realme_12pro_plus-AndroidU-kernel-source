@@ -623,14 +623,14 @@ static void sysmon_stop(struct rproc_subdev *subdev, bool crashed)
 	if (crashed)
 		return;
 
+	sysmon->timeout_data.timer.function = sysmon_shutdown_notif_timeout_handler;
+	timeout = jiffies + msecs_to_jiffies(SYSMON_NOTIF_TIMEOUT);
+	mod_timer(&sysmon->timeout_data.timer, timeout);
+
 	if (sysmon->ssctl_instance) {
 		if (!wait_for_completion_timeout(&sysmon->ssctl_comp, HZ / 2))
 			dev_err(sysmon->dev, "timeout waiting for ssctl service\n");
 	}
-
-	sysmon->timeout_data.timer.function = sysmon_shutdown_notif_timeout_handler;
-	timeout = jiffies + msecs_to_jiffies(SYSMON_NOTIF_TIMEOUT);
-	mod_timer(&sysmon->timeout_data.timer, timeout);
 
 	if (sysmon->ssctl_version)
 		sysmon->shutdown_acked = ssctl_request_shutdown(sysmon);
@@ -875,9 +875,7 @@ struct qcom_sysmon *qcom_add_sysmon_subdev(struct rproc *rproc,
 		if (sysmon->shutdown_irq != -ENODATA) {
 			dev_err(sysmon->dev,
 				"failed to retrieve shutdown-ack IRQ\n");
-			ret = sysmon->shutdown_irq;
-			kfree(sysmon);
-			return ERR_PTR(ret);
+			return ERR_PTR(sysmon->shutdown_irq);
 		}
 	} else {
 		ret = devm_request_threaded_irq(sysmon->dev,
@@ -888,7 +886,6 @@ struct qcom_sysmon *qcom_add_sysmon_subdev(struct rproc *rproc,
 		if (ret) {
 			dev_err(sysmon->dev,
 				"failed to acquire shutdown-ack IRQ\n");
-			kfree(sysmon);
 			return ERR_PTR(ret);
 		}
 	}

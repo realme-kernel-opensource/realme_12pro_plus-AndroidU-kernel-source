@@ -165,7 +165,6 @@ static unsigned long get_task_unreclaimable_info(struct task_struct *task)
 	int ret = 0;
 
 	for_each_thread(task, thread) {
-		/* task is already locked don't lock/unlock again. */
 		if (task != thread)
 			task_lock(thread);
 		if (unlikely(!group_leader_files))

@@ -328,6 +328,8 @@ static void gen7_snapshot_shader(struct kgsl_device *device,
 	if (adreno_is_gen7_0_x_family(adreno_dev))
 		kgsl_regrmw(device, GEN7_SP_DBG_CNTL, GENMASK(1, 0), BIT(0) | BIT(1));
 
+	kgsl_regrmw(device, GEN7_SP_DBG_CNTL, GENMASK(1, 0), BIT(0) | BIT(1));
+
 	if (CD_SCRIPT_CHECK(device)) {
 		for (i = 0; i < num_shader_blocks; i++) {
 			struct gen7_shader_block *block = &shader_blocks[i];

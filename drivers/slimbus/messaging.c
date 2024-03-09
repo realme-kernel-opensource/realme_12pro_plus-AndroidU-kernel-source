@@ -153,7 +153,6 @@ int slim_do_transfer(struct slim_controller *ctrl, struct slim_msg_txn *txn)
 				txn->comp = comp;
 			return ret;
 		}
-
 		if (ctrl->sched.clk_state != SLIM_CLK_ACTIVE) {
 			dev_err(ctrl->dev, "ctrl wrong state:%d, ret:%d\n",
 				ctrl->sched.clk_state, ret);

@@ -186,9 +186,19 @@ static int pm8008_read(struct regmap *regmap,  u16 reg, u8 *val, int count)
 	int rc;
 
 	rc = regmap_bulk_read(regmap, reg, val, count);
-	if (rc < 0)
-		pr_err("failed to read 0x%04x\n", reg);
-
+	if (rc < 0){
+		pr_err("failed to read 0x%04x try again1\n", reg);
+		msleep(5);
+		rc = regmap_bulk_read(regmap, reg, val, count);
+		if (rc < 0){
+			pr_err("failed to read 0x%04x\n try again2", reg);
+			msleep(5);
+			rc = regmap_bulk_read(regmap, reg, val, count);
+			if (rc < 0){
+				pr_err("failed to read 0x%04x\n", reg);
+			}
+		}
+	}
 	return rc;
 }
 
@@ -199,9 +209,19 @@ static int pm8008_write(struct regmap *regmap, u16 reg, const u8 *val,
 
 	pr_debug("Writing 0x%02x to 0x%04x\n", val, reg);
 	rc = regmap_bulk_write(regmap, reg, val, count);
-	if (rc < 0)
-		pr_err("failed to write 0x%04x\n", reg);
-
+	if (rc < 0){
+		pr_err("failed to write 0x%04x try again1\n", reg);
+		msleep(5);
+		rc = regmap_bulk_write(regmap, reg, val, count);
+		if (rc < 0){
+			pr_err("failed to write 0x%04x try again2\n", reg);
+			msleep(5);
+			rc = regmap_bulk_write(regmap, reg, val, count);
+			if (rc < 0){
+				pr_err("failed to write 0x%04x\n", reg);
+			}
+		}
+	}
 	return rc;
 }
 
@@ -212,10 +232,22 @@ static int pm8008_masked_write(struct regmap *regmap, u16 reg, u8 mask,
 
 	pr_debug("Writing 0x%02x to 0x%04x with mask 0x%02x\n", val, reg, mask);
 	rc = regmap_update_bits(regmap, reg, mask, val);
-	if (rc < 0)
-		pr_err("failed to write 0x%02x to 0x%04x with mask 0x%02x\n",
+	if (rc < 0){
+		pr_err("failed to write 0x%02x to 0x%04x with mask 0x%02x try again1\n",
 				val, reg, mask);
-
+		msleep(5);
+		rc = regmap_update_bits(regmap, reg, mask, val);
+		if (rc < 0){
+			pr_err("failed to write 0x%02x to 0x%04x with mask 0x%02x try again2\n",
+				val, reg, mask);
+			msleep(5);
+			rc = regmap_update_bits(regmap, reg, mask, val);
+			if (rc < 0){
+				pr_err("failed to write 0x%02x to 0x%04x with mask 0x%02x\n",
+				val, reg, mask);
+			}
+		}
+	}
 	return rc;
 }
 
